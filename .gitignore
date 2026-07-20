@@ -1,0 +1,20 @@
+node_modules/
+
+# React Router
+/.react-router/
+/build/
+
+# Env
+.env
+.env.local
+.env.*.local
+
+# Logs
+*.log
+npm-debug.log*
+
+# Editor / OS
+.DS_Store
+.idea/
+.vscode/
+*.swp

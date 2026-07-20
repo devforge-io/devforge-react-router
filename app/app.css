@@ -1,0 +1,256 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@import "@fontsource-variable/geist/index.css";
+@import "@fontsource-variable/geist-mono/index.css";
+
+/* ── Custom variants ─────────────────────────────────────────────────────── */
+@custom-variant xs (@media (min-width: 475px));
+
+/* ── Theme tokens (exposed to Tailwind utilities) ────────────────────────── */
+@theme {
+  --font-sans: "Geist Variable", ui-sans-serif, system-ui, -apple-system,
+    "Segoe UI", Roboto, sans-serif;
+  --font-mono: "Geist Mono Variable", ui-monospace, "SF Mono", "Fira Code",
+    monospace;
+
+  /* Devforge master palette — molten metal on cold iron */
+  --color-forge: #f5a524;
+  --color-forge-bright: #ffcf5c;
+  --color-ember: #f97316;
+  --color-molten: #ef4444;
+  --color-iron: #0a0812;
+  --color-iron-800: #12101c;
+  --color-iron-700: #1b1826;
+
+  /* Product accents */
+  --color-anvil: #4f8fea;
+  --color-aegis: #2dd4bf;
+  --color-foundry: #fb923c;
+  --color-stencil: #d946ef;
+
+  --animate-ember-rise: emberRise linear infinite;
+  --animate-spark: sparkFly ease-in infinite;
+  --animate-pulse-slow: pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  --animate-grid-pan: gridPan 16s linear infinite;
+  --animate-shimmer: shimmer 2.6s ease-in-out infinite;
+  --animate-marquee: marquee 40s linear infinite;
+}
+
+/* ── Design tokens (raw, theme-switchable) ───────────────────────────────── */
+:root {
+  --df-bg: #08060f;
+  --df-bg-gradient: radial-gradient(
+      140% 120% at 50% -10%,
+      #17122a 0%,
+      #0b0817 42%,
+      #08060f 100%
+    );
+  --df-panel-gradient: linear-gradient(160deg, #14111f 0%, #0b0813 100%);
+  --df-surface: rgba(20, 17, 33, 0.72);
+  --df-surface-deep: rgba(10, 8, 18, 0.9);
+  --df-hairline: rgba(245, 165, 36, 0.16);
+  --df-hairline-cool: rgba(129, 140, 248, 0.14);
+
+  --df-ink: rgba(255, 255, 255, 0.9);
+  --df-ink-muted: rgba(255, 255, 255, 0.56);
+  --df-ink-dim: rgba(255, 255, 255, 0.34);
+  --df-ink-bright: #ffffff;
+
+  --radius: 0.75rem;
+}
+
+html,
+body {
+  background: var(--df-bg);
+  color: var(--df-ink);
+  color-scheme: dark;
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  scroll-behavior: smooth;
+}
+
+body {
+  overflow-x: hidden;
+}
+
+::selection {
+  background: rgba(245, 165, 36, 0.28);
+  color: #fff;
+}
+
+/* Slim, on-brand scrollbar */
+::-webkit-scrollbar {
+  width: 9px;
+  height: 9px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #f5a524, #ef4444);
+  border-radius: 999px;
+  border: 2px solid var(--df-bg);
+}
+
+/* Respect reduced motion — freeze the ambient loops */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ── Reusable utilities ──────────────────────────────────────────────────── */
+@utility text-molten {
+  background: linear-gradient(120deg, #ffcf5c 0%, #f97316 46%, #ef4444 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+}
+
+@utility panel {
+  background: var(--df-panel-gradient);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: var(--radius);
+}
+
+@utility hairline {
+  border: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+/* ── Keyframes ───────────────────────────────────────────────────────────── */
+@keyframes pulse {
+  50% {
+    opacity: 0.55;
+  }
+}
+
+@keyframes emberRise {
+  0% {
+    transform: translateY(0) translateX(0) scale(1);
+    opacity: 0;
+  }
+  10% {
+    opacity: var(--ember-opacity, 0.8);
+  }
+  85% {
+    opacity: var(--ember-opacity, 0.8);
+  }
+  100% {
+    transform: translateY(-118vh) translateX(var(--ember-drift, 20px)) scale(0.4);
+    opacity: 0;
+  }
+}
+
+@keyframes sparkFly {
+  0% {
+    transform: translate(0, 0) rotate(18deg);
+    opacity: 0;
+  }
+  6% {
+    opacity: 1;
+  }
+  20% {
+    opacity: 0;
+  }
+  100% {
+    transform: translate(120vw, -60vh) rotate(18deg);
+    opacity: 0;
+  }
+}
+
+@keyframes gridPan {
+  from {
+    background-position: 0 0, 0 0;
+  }
+  to {
+    background-position: 64px 64px, 64px 64px;
+  }
+}
+
+@keyframes shimmer {
+  0%,
+  100% {
+    opacity: 0.35;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes glowPulse {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.4;
+  }
+  50% {
+    transform: scale(1.22);
+    opacity: 0.68;
+  }
+}
+
+@keyframes ringPulse {
+  0% {
+    transform: scale(1);
+    opacity: 0.5;
+  }
+  100% {
+    transform: scale(2.6);
+    opacity: 0;
+  }
+}
+
+@keyframes spin360 {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes spin360rev {
+  to {
+    transform: rotate(-360deg);
+  }
+}
+
+@keyframes coreBeat {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.92;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 1;
+  }
+}
+
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes caret {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+}
+
+.animate-caret {
+  animation: caret 1.1s step-end infinite;
+}
