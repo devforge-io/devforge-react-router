@@ -1,13 +1,13 @@
 import { SITE } from "~/data/site";
 
 const OG_IMAGE = `${SITE.url}/og.png`;
-const DEFAULT_TITLE = `${SITE.name} — ${SITE.tagline}`;
+const DEFAULT_TITLE = `${SITE.name} · ${SITE.tagline}`;
 
 /**
  * Build a complete set of meta descriptors for a route.
  *
  * React Router renders only the *leaf* route's `meta` (child meta REPLACES parent
- * meta — they are not merged). So every route must emit the full Open Graph /
+ * meta, they are not merged). So every route must emit the full Open Graph /
  * Twitter set itself; this helper keeps that DRY and consistent.
  */
 export function pageMeta({

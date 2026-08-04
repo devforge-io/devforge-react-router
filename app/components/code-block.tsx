@@ -37,7 +37,7 @@ export function CodeBlock({
       setCopied(true);
       setTimeout(() => setCopied(false), 1600);
     } catch {
-      /* clipboard unavailable — ignore */
+      /* clipboard unavailable, ignore */
     }
   }
 

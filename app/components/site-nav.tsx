@@ -4,7 +4,6 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Menu, X } from "lucide-react";
 import { NAV_LINKS, SITE } from "~/data/site";
 import { DevforgeWordmark } from "~/components/logo";
-import { GithubIcon } from "~/components/brand-icons";
 import { cn } from "~/lib/utils";
 
 export function SiteNav() {
@@ -71,15 +70,6 @@ export function SiteNav() {
         </div>
 
         <div className="hidden items-center gap-2 md:flex">
-          <a
-            href={SITE.socials.github}
-            target="_blank"
-            rel="noreferrer noopener"
-            aria-label="Devforge on GitHub"
-            className="rounded-full p-2 text-white/55 transition-colors hover:bg-white/5 hover:text-white"
-          >
-            <GithubIcon size={18} />
-          </a>
           <Link
             to="/contact"
             className="rounded-full bg-white/5 px-4 py-2 text-sm font-medium text-white ring-1 ring-white/10 transition-all hover:-translate-y-0.5 hover:bg-white/10"
@@ -127,14 +117,6 @@ export function SiteNav() {
                   {link.label}
                 </NavLink>
               ))}
-              <a
-                href={SITE.socials.github}
-                target="_blank"
-                rel="noreferrer noopener"
-                className="mt-1 flex items-center gap-2 rounded-lg px-4 py-3 text-base text-white/70 hover:bg-white/5 hover:text-white"
-              >
-                <GithubIcon size={20} /> GitHub
-              </a>
             </div>
           </motion.div>
         )}

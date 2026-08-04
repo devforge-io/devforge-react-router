@@ -3,9 +3,9 @@ import { cn } from "~/lib/utils";
 /**
  * Brand assets. The real Devforge logo is a detailed metallic emblem + wordmark;
  * we ship two transparent PNGs derived from it:
- *   - /devforge-emblem.png  — emblem only (hammer + anvil + gear + </>)
- *   - /devforge-logo.png    — full stacked lockup (emblem over DEVFORGE)
- * For tiny surfaces (favicon) a simplified inline glyph — DevforgeMark — is used.
+ *   - /devforge-emblem.png, emblem only (hammer + anvil + gear + </>)
+ *   - /devforge-logo.png, full stacked lockup (emblem over DEVFORGE)
+ * For tiny surfaces (favicon) a simplified inline glyph, DevforgeMark, is used.
  */
 
 /** The forge emblem as a transparent image. Wider than tall (~1.8:1). */
@@ -87,7 +87,7 @@ export function DevforgeWordmark({
 }
 
 /**
- * Simplified inline mark (anvil + spark) — used where a raster emblem would be
+ * Simplified inline mark (anvil + spark), used where a raster emblem would be
  * muddy (favicon-scale) or as a no-request fallback. Mirrors /favicon.svg.
  */
 export function DevforgeMark({

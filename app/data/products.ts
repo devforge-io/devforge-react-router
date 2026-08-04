@@ -29,31 +29,31 @@ export type Product = {
   features: Feature[];
   stats?: Stat[];
   code: CodeSample[];
-  links: { label: string; href: string; kind: "primary" | "ghost" }[];
+  links: { label: string; href: string; kind: "primary" | "ghost"; download?: boolean }[];
 };
 
 export const PRODUCTS: Product[] = [
   {
     slug: "anvil-db",
     key: "anvil",
-    name: "Anvil DB",
+    name: "Anvil",
     wordmark: "Anvil",
     icon: "Waypoints",
     accent: "#4f8fea",
     glow: "#7babf0",
     status: "Public Alpha",
     language: "Rust",
-    forgeNote: "The anvil — where connected data is shaped.",
+    forgeNote: "The anvil, where connected data is shaped.",
     eyebrow: "GRAPH DATABASE",
     tagline: "The graph database forged for performance.",
     subtitle:
-      "A Rust-powered graph database with a native Cypher engine, ACID transactions, an auto-generated GraphQL API, and built-in graph algorithms — engineered for speed, safety, and scale.",
+      "A Rust-powered graph database with a native Cypher engine, ACID transactions, an auto-generated GraphQL API, and built-in graph algorithms, engineered for speed, safety, and scale.",
     blurb:
-      "Rust graph database with Cypher, ACID, GraphQL and built-in algorithms — batteries included, in a single binary.",
+      "Rust graph database with Cypher, ACID, GraphQL and built-in algorithms, batteries included, in a single binary.",
     overview:
-      "Building connected-data applications normally means stitching together a graph engine, a document store, a GraphQL layer, an auth service, file storage and an admin UI. Anvil collapses all of it into one memory-safe Rust binary with no sidecars — so you focus on your data, not your infrastructure. It speaks Cypher and GraphQL, connects through native drivers in four languages, and imports Neo4j dumps. No JVM. No garbage-collection pauses.",
+      "Building connected-data applications normally means stitching together a graph engine, a document store, a GraphQL layer, an auth service, file storage and an admin UI. Anvil collapses all of it into one memory-safe Rust binary with no sidecars, so you focus on your data, not your infrastructure. It speaks Cypher and GraphQL, connects through native drivers in four languages, and imports Neo4j dumps. No JVM. No garbage-collection pauses.",
     highlights: [
-      "No JVM, no GC pauses — pure Rust",
+      "No JVM, no GC pauses, pure Rust",
       "Cypher-compatible; imports Neo4j dumps",
       "Native drivers for Rust, TypeScript, Python & Go",
       "Single binary, no sidecars to deploy",
@@ -105,7 +105,7 @@ export const PRODUCTS: Product[] = [
         icon: "Gauge",
         title: "Hammer visual browser",
         description:
-          "A browser UI with a Cypher editor, force-directed graph visualization, a schema browser, monitoring dashboard and RLS policy manager — included.",
+          "A browser UI with a Cypher editor, force-directed graph visualization, a schema browser, monitoring dashboard and RLS policy manager. All bundled in.",
       },
     ],
     stats: [
@@ -170,6 +170,101 @@ cargo add anvilent   npm i anvilent   pip install anvilent`,
   },
 
   {
+    slug: "hammer",
+    key: "hammer",
+    name: "Hammer",
+    wordmark: "Hammer",
+    icon: "Hammer",
+    accent: "#a78bfa",
+    glow: "#c4b5fd",
+    status: "Public Alpha",
+    language: "TypeScript",
+    forgeNote: "The hammer, the tool that shapes what's on the anvil.",
+    eyebrow: "GRAPH EXPLORER",
+    tagline: "Explore your graph, visually.",
+    subtitle:
+      "Hammer is the web management UI for Anvil DB: a Cypher and GraphQL editor, an interactive force-directed graph canvas, schema and document browsers, and admin, monitoring and security tools, all in the browser.",
+    blurb:
+      "The web management UI for Anvil DB: query, visualize and administer your graph from the browser.",
+    overview:
+      "Hammer is the browser-based control room for Anvil DB. Write Cypher and GraphQL with rich result views, explore relationships on an interactive force-directed canvas, browse your schema and documents, and manage row-level security, functions, triggers, users and monitoring without leaving the page. It ships with Anvil, so a running database comes with a full visual workbench.",
+    highlights: [
+      "Cypher and GraphQL editors with table, JSON, graph and plan views",
+      "Interactive force-directed graph canvas with focus mode",
+      "Schema, documents, RLS policies, functions and triggers",
+      "Admin, monitoring and slow-query tools, all in the browser",
+    ],
+    features: [
+      {
+        icon: "Terminal",
+        title: "Cypher and GraphQL editors",
+        description:
+          "Write Cypher or explore the auto-generated GraphQL API, with table, JSON, graph and query-plan result views, plus full schema introspection.",
+      },
+      {
+        icon: "Network",
+        title: "Interactive graph canvas",
+        description:
+          "A D3 force-directed canvas with focus mode, neighbor orbit, lasso select, a minimap, four layouts and PNG/SVG export.",
+      },
+      {
+        icon: "Database",
+        title: "Schema and document browser",
+        description:
+          "Browse labels, relationship types, property keys, indexes and constraints, and do full collection CRUD with a JSON editor and sync rules.",
+      },
+      {
+        icon: "Lock",
+        title: "Security and access control",
+        description:
+          "Create and simulate row-level security policies, toggle RLS, and manage users and roles. Admin-only pages are enforced client and server-side.",
+      },
+      {
+        icon: "Braces",
+        title: "Functions and triggers",
+        description:
+          "Author, test and manage stored Cypher functions and event-driven triggers, with an activity log and dependency analysis.",
+      },
+      {
+        icon: "Gauge",
+        title: "Live monitoring",
+        description:
+          "Real-time server stats, a slow-query log, an event log and an alerts panel, so you can watch the database as it runs.",
+      },
+    ],
+    code: [
+      {
+        label: "Run it",
+        lang: "bash",
+        code: `npm install
+npm run dev   # http://localhost:5175`,
+      },
+      {
+        label: "Query",
+        lang: "cypher",
+        code: `// paste into the Cypher editor
+MATCH (p:Person)-[:FRIEND]->(f)
+RETURN p, collect(f.name) AS friends`,
+      },
+      {
+        label: "Connect",
+        lang: "bash",
+        code: `# Hammer talks to Anvil over HTTP
+# default: http://localhost:7474
+# set the URL in a connection profile, then log in`,
+      },
+    ],
+    links: [
+      { label: "Visit anvildb.com", href: "https://anvildb.com", kind: "primary" },
+      {
+        label: "View on GitHub",
+        href: "https://github.com/devforge-io/anvil",
+        kind: "ghost",
+      },
+    ],
+  },
+
+  {
     slug: "aegis",
     key: "aegis",
     name: "Aegis",
@@ -179,17 +274,17 @@ cargo add anvilent   npm i anvilent   pip install anvilent`,
     glow: "#5eead4",
     status: "v0.1 · Early",
     language: "Rust",
-    forgeNote: "The shield — one guarded door for every request.",
+    forgeNote: "The shield, one guarded door for every request.",
     eyebrow: "EGRESS PROXY",
     tagline: "One controlled door for all your outbound traffic.",
     subtitle:
-      "A minimal, header-driven HTTP forwarding proxy written in Rust. Put the destination in an X-Target-Url header; Aegis authenticates, allowlists, terminates TLS and streams the response back — from a single binary.",
+      "A minimal, header-driven HTTP forwarding proxy written in Rust. Put the destination in an X-Target-Url header; Aegis authenticates, allowlists, terminates TLS and streams the response back, all from a single binary.",
     blurb:
-      "A minimal, header-driven HTTP forwarding proxy in Rust — one authenticated, allowlisted, TLS-terminating egress point.",
+      "A minimal, header-driven HTTP forwarding proxy in Rust: one authenticated, allowlisted, TLS-terminating egress point.",
     overview:
-      "Applications that call external APIs need a controlled, observable egress point — to centralize outbound traffic, enforce which upstreams are reachable, authenticate who may use the door, terminate and rotate TLS, and get consistent request logging. Aegis does exactly that and nothing more: no route configuration, no service mesh, no heavyweight gateway. Each request carries its target in one header; the proxy forwards the method, headers and body, and streams the response back verbatim.",
+      "Applications that call external APIs need a controlled, observable egress point, to centralize outbound traffic, enforce which upstreams are reachable, authenticate who may use the door, terminate and rotate TLS, and get consistent request logging. Aegis does exactly that and nothing more: no route configuration, no service mesh, no heavyweight gateway. Each request carries its target in one header; the proxy forwards the method, headers and body, and streams the response back verbatim.",
     highlights: [
-      "One header: X-Target-Url — no route config",
+      "One header: X-Target-Url, no route config",
       "TLS certs hot-reload live, no restart",
       "Tokens stored as SHA-256 only, compared in constant time",
       "Single static binary: Linux, macOS & Windows",
@@ -217,7 +312,7 @@ cargo add anvilent   npm i anvilent   pip install anvilent`,
         icon: "RefreshCw",
         title: "TLS hot-reload",
         description:
-          "Watches cert and key files and swaps certificates live on change — no restart, no signal. Certbot, acme.sh and Kubernetes mounted secrets just work.",
+          "Watches cert and key files and swaps certificates live on change, no restart, no signal. Certbot, acme.sh and Kubernetes mounted secrets just work.",
       },
       {
         icon: "GitCommit",
@@ -229,7 +324,7 @@ cargo add anvilent   npm i anvilent   pip install anvilent`,
         icon: "ScrollText",
         title: "Structured, redacted logs",
         description:
-          "One tracing line per request and response, with sensitive headers — Authorization, Cookie, Proxy-Authorization — automatically redacted.",
+          "One tracing line per request and response, with sensitive headers (Authorization, Cookie, Proxy-Authorization) automatically redacted.",
       },
       {
         icon: "Server",
@@ -288,22 +383,22 @@ sudo systemctl enable --now aegis`,
     icon: "MessagesSquare",
     accent: "#fb923c",
     glow: "#fdba74",
-    status: "v0.1 · In development",
+    status: "v0.1 · Beta",
     language: "Rust",
-    forgeNote: "The foundry — where a team is cast together.",
+    forgeNote: "The foundry, where a team is cast together.",
     eyebrow: "TEAM CHAT & VIDEO",
-    tagline: "Your team chat, in your Git repo.",
+    tagline: "Your team chat. Your server. Your data.",
     subtitle:
-      "A self-hosted, Slack-like team chat and video platform built in Rust — running on its own in-memory graph engine, with Git as the durable store. No database. No cloud lock-in.",
+      "A self-hosted, Slack-like platform for team chat, calls and screen sharing. Real-time messaging and video over its own pure-Rust SFU, on a custom in-memory graph engine that persists snapshots to disk. One binary, no external database; Git is used only for offsite backup.",
     blurb:
-      "Self-hosted, Slack-like chat and video in Rust. An in-memory graph runtime with Git as the durable store — no database.",
+      "Self-hosted, Slack-like chat and video in Rust. A custom in-memory graph engine with snapshots on disk; Git only for backup. No external database.",
     overview:
-      "Foundry gives teams Slack-style chat and calls without their conversations, files and identities living in someone else's cloud. It runs on its own in-memory property-graph engine as the runtime source of truth, uses the filesystem for instant crash-proof durability, and commits everything to Git for offsite backup and restore-by-clone. It is event-sourced end to end, so live state and recovered state are identical by construction — you can literally git log your history.",
+      "Foundry gives teams Slack-style chat, calls and screen sharing without their conversations, files and identities living in someone else's cloud. Data lives in a custom in-memory graph engine that is the runtime source of truth; every change is appended to disk the instant it happens, so a crash loses nothing, and periodic snapshots are written to disk and read straight back on boot. Git is used only for backup: each snapshot is committed for a rollback history and pushed to a remote for an offsite copy, with restore-by-clone on a fresh boot. It is event-sourced end to end, so live state and recovered state are identical by construction, and it installs as a single self-hosted binary.",
     highlights: [
-      "Event-sourced: live state == recovered state",
-      "git log your entire message history",
-      "Its own pure-Rust SFU — no third-party media service",
-      "Native Tauri desktop client",
+      "Self-hosted server: one binary, one public port + a media UDP range",
+      "Desktop client for macOS and Windows, pointed at your server",
+      "Video, voice and screen sharing over its own pure-Rust SFU",
+      "Custom in-memory graph engine; snapshots on disk, Git for backup",
     ],
     features: [
       {
@@ -314,72 +409,79 @@ sudo systemctl enable --now aegis`,
       },
       {
         icon: "Video",
-        title: "Built-in video & screen sharing",
+        title: "Video, voice & screen sharing",
         description:
-          "Foundry ships its own pure-Rust SFU embedded in the server binary, speaking the IETF WISH standard (WHIP to publish, WHEP to subscribe). Anyone can share their screen, several at once.",
+          "An embedded, pure-Rust SFU (WHIP/WHEP) forwards calls at direct, group or channel scope, with ring, accept and decline. Several people can share their screen at once, each share can carry its own audio, and quality adapts to each viewer's connection.",
+      },
+      {
+        icon: "Lock",
+        title: "Channel access control & groups",
+        description:
+          "Restrict a channel by role, by named groups or by explicit membership; make it visible-but-locked or invisible; approve request-to-join. Calls are off by default per channel. All enforced server-side.",
       },
       {
         icon: "FolderGit2",
         title: "Git-backed backup & restore",
         description:
-          "Instance-wide snapshots are committed and pushed to a GitHub remote. A fresh boot with no local data restores the whole instance by cloning the remote.",
+          "Snapshots are committed and pushed to a GitHub remote (env config or in-app Sign in with GitHub); a fresh boot with no local data restores the whole instance by cloning the remote.",
       },
       {
-        icon: "Lock",
-        title: "Channel access control",
+        icon: "Globe",
+        title: "Link previews & attachments",
         description:
-          "Restrict channels by role, by named groups or by explicit membership — visible-but-locked or fully invisible, with request-to-join approval. All enforced server-side.",
+          "Links unfurl as sender-resolved OpenGraph cards with inline YouTube, Vimeo and image embeds. File attachments are content-addressed, stored once, and images render inline.",
       },
       {
-        icon: "KeyRound",
-        title: "Real accounts & security",
+        icon: "Server",
+        title: "Server & desktop client",
         description:
-          "Register and log in with Argon2id-hashed passwords (only the PHC hash is stored) and stateless HMAC-signed session tokens — no server-side session store.",
-      },
-      {
-        icon: "Boxes",
-        title: "Content-addressed attachments",
-        description:
-          "Uploads are stored once per unique file; images render inline, everything else as downloads — all backed up and restored alongside your messages.",
+          "Self-host the server binary (a start/stop/status daemon; foundry init scaffolds a production :443 config with HTTPS/WSS hot-reloading certs, a media UDP range and coturn for NAT). The desktop client is a normal download you point at your server. Argon2id passwords, stateless HMAC sessions.",
       },
     ],
     code: [
       {
-        label: "Run it",
+        label: "1 · Server",
         lang: "bash",
-        code: `# server on http://127.0.0.1:8080
-cargo run -p foundry-server
+        code: `# install the server (published release binary)
+curl -fsSL https://devforge.io/foundry/install.sh | sh
 
-# desktop app
-cd client && pnpm install && pnpm tauri dev`,
+# scaffold a production config: one public :443 + media UDP range
+sudo foundry init
+sudo foundry start`,
       },
       {
-        label: "It's just Git",
+        label: "2 · Ports & TLS",
         lang: "bash",
-        code: `# every message is a commit-backed event
-git -C data log
+        code: `# point at your TLS certs (hot-reloaded on renewal)
+FOUNDRY_TLS_CERT=/etc/foundry/tls.crt
+FOUNDRY_TLS_KEY=/etc/foundry/tls.key
 
-# inspect any point in history
-git -C data show`,
+# open the firewall (Ubuntu ufw)
+sudo ufw allow 443/tcp           # messaging, API, uploads, signaling
+sudo ufw allow 16384:32768/udp   # call media (SFU RTP/SRTP)
+sudo ufw allow 3478:3479/udp     # STUN/TURN (coturn) for NAT`,
       },
       {
-        label: "Typed protocol",
-        lang: "rust",
-        code: `pub enum ClientMsg {
-    Register     { username: String, password: String },
-    Login        { username: String, password: String },
-    SendMessage  { channel_id: String, text: String },
-    CreateOrg    { name: String },
-    CreateChannel{ org_id: String, name: String },
-    // call_start / call_join / call_publish, admin, access control ...
-}`,
+        label: "3 · Desktop app",
+        lang: "bash",
+        code: `# download the installer for your OS from the releases page
+#   macOS .dmg   Windows .msi/.exe
+# then point it at your server (no rebuild needed):
+#   macOS  ~/Library/Application Support/io.devforge.foundry/config.json
+{ "server": "https://foundry.example.com" }`,
       },
     ],
     links: [
       {
-        label: "View on GitHub",
-        href: "https://github.com/devforge-io/foundry",
+        label: "Download the app",
+        href: "https://github.com/devforge-io/foundry/releases",
         kind: "primary",
+        download: true,
+      },
+      {
+        label: "Server install guide",
+        href: "/products/foundry/server",
+        kind: "ghost",
       },
     ],
   },
@@ -394,15 +496,15 @@ git -C data show`,
     glow: "#e879f9",
     status: "Production-ready",
     language: "TypeScript",
-    forgeNote: "The stencil — patterns you press onto the web.",
+    forgeNote: "The stencil, patterns you press onto the web.",
     eyebrow: "GIT-BACKED CMS",
-    tagline: "Author content and design layouts — stored as files in Git.",
+    tagline: "Author content and design layouts, stored as files in Git.",
     subtitle:
-      "A headless CMS with a visual page builder bolted on. Write Markdown, articles and wiki markup, or drag-and-drop pages and per-visitor components — all committed to your GitHub repo, versioned, and served or embedded anywhere. No database.",
+      "A headless CMS with a visual page builder bolted on. Write Markdown, articles and wiki markup, or drag-and-drop pages and per-visitor components, all committed to your GitHub repo, versioned, and served or embedded anywhere. No database.",
     blurb:
       "Git-backed CMS and visual page builder. Content is human-readable files in your repo; every save is a commit. No database.",
     overview:
-      "Traditional CMSes hide your content behind a database and split 'headless content' from 'visual layout'. Stencil does neither. Content lives as plain, human-readable files in your GitHub repository — Markdown, articles, wiki markup and drag-and-drop pages — and every save is a real commit with a draft-to-publish workflow, full history and side-by-side diffs. Editors get a rich visual builder and WYSIWYG editor; developers keep Git as the publishing pipeline and per-visitor personalization resolved on the server.",
+      "Traditional CMSes hide your content behind a database and split 'headless content' from 'visual layout'. Stencil does neither. Content lives as plain, human-readable files in your GitHub repository (Markdown, articles, wiki markup and drag-and-drop pages), and every save is a real commit with a draft-to-publish workflow, full history and side-by-side diffs. Editors get a rich visual builder and WYSIWYG editor; developers keep Git as the publishing pipeline and per-visitor personalization resolved on the server.",
     highlights: [
       "Every save is a real Git commit",
       "Draft → publish, with full history & diffs",
@@ -414,7 +516,7 @@ git -C data show`,
         icon: "Blocks",
         title: "Visual page builder",
         description:
-          "Drag-and-drop blocks, a layers tree, live Tailwind class editing and a responsive canvas — outputting clean, self-hosted HTML with no build step.",
+          "Drag-and-drop blocks, a layers tree, live Tailwind class editing and a responsive canvas, outputting clean, self-hosted HTML with no build step.",
       },
       {
         icon: "GitBranch",
@@ -426,13 +528,13 @@ git -C data show`,
         icon: "Component",
         title: "Conditional components",
         description:
-          "Components that render a different branch per visitor based on auth, geo, time, device, query params or A/B bucket — resolved server-side, edited in a visual flow diagram.",
+          "Components that render a different branch per visitor based on auth, geo, time, device, query params or A/B bucket, resolved server-side, edited in a visual flow diagram.",
       },
       {
         icon: "Layers",
         title: "Reusable components",
         description:
-          "Build a fragment once — nav, footer, CTA — and drop it into any page. Edits propagate everywhere it is used.",
+          "Build a fragment once (nav, footer, CTA) and drop it into any page. Edits propagate everywhere it is used.",
       },
       {
         icon: "PenTool",
@@ -444,7 +546,7 @@ git -C data show`,
         icon: "Globe",
         title: "Headless API & embeds",
         description:
-          "An edge-cached public site, a CORS-enabled read-only JSON API and template-free auto-resizing iframe embeds — serve or embed your content anywhere.",
+          "An edge-cached public site, a CORS-enabled read-only JSON API and template-free auto-resizing iframe embeds. Serve or embed your content anywhere.",
       },
     ],
     code: [
@@ -497,15 +599,15 @@ export function getProduct(slug: string): Product | undefined {
 export const PRINCIPLES: { title: string; body: string }[] = [
   {
     title: "The right tool for each layer",
-    body: "Rust for the performance-critical engines and daemons — no JVM, no garbage-collection pauses. React and React Native for the apps and clients. Fast where it counts, familiar everywhere else.",
+    body: "Performance-critical engines built for speed; interfaces built to feel familiar. We reach for whatever fits each layer, and never make you pay for the wrong choice.",
   },
   {
     title: "Own your data",
-    body: "Self-hostable by default, with no vendor lock-in. Your graphs, content and messages live in stores and files you control — not someone else's cloud.",
+    body: "Self-hostable by default, with no vendor lock-in. Your graphs, content and messages live in stores and files you control, not someone else's cloud.",
   },
   {
     title: "Open and familiar",
-    body: "Standards you already know — Cypher, GraphQL, WHIP/WHEP, Git — not a walled garden. Import your existing data and keep your existing tools.",
+    body: "Standards you already know (Cypher, GraphQL, WHIP/WHEP, Git), not a walled garden. Import your existing data and keep your existing tools.",
   },
   {
     title: "Built to be understood",

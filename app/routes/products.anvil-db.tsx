@@ -10,7 +10,7 @@ export function meta(_: Route.MetaArgs) {
   const p = getProduct(SLUG);
   if (!p) return pageMeta();
   return pageMeta({
-    title: `${p.name} — ${p.eyebrow} · ${SITE.name}`,
+    title: `${p.name} · ${p.eyebrow} · ${SITE.name}`,
     description: p.subtitle,
     path: `/products/${p.slug}`,
   });

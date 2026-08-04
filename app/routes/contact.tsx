@@ -1,9 +1,8 @@
 import type { Route } from "./+types/contact";
 import { Form } from "react-router";
-import { CheckCircle2, Mail, Send } from "lucide-react";
+import { CheckCircle2, Send } from "lucide-react";
 import { PRODUCTS } from "~/data/products";
 import { SITE } from "~/data/site";
-import { DiscordIcon, GithubIcon } from "~/components/brand-icons";
 import { EmberField } from "~/components/ember-field";
 import { CornerBrackets, Eyebrow } from "~/components/primitives";
 import { Reveal } from "~/components/reveal";
@@ -12,7 +11,7 @@ import { pageMeta } from "~/lib/meta";
 
 export function meta(_: Route.MetaArgs) {
   return pageMeta({
-    title: `Contact — ${SITE.name}`,
+    title: `Contact · ${SITE.name}`,
     description: `Get in touch with ${SITE.company} about Anvil DB, Aegis, Foundry or Stencil.`,
     path: "/contact",
   });
@@ -39,13 +38,13 @@ export async function action({
   if (name.length < 2) errors.name = "Please tell us your name.";
   if (!EMAIL_RE.test(email)) errors.email = "Enter a valid email address.";
   if (message.length < 10)
-    errors.message = "A little more detail helps — 10 characters or more.";
+    errors.message = "A little more detail helps: 10 characters or more.";
 
   if (Object.keys(errors).length > 0) {
     return { ok: false, errors, values: { name, email, topic, message } };
   }
 
-  // In a real deployment, forward the message here — e.g. Resend, a webhook, or
+  // In a real deployment, forward the message here, e.g. Resend, a webhook, or
   // an internal queue. This route intentionally does the validation server-side
   // so the form works with or without client JavaScript.
   return { ok: true };
@@ -87,39 +86,6 @@ export default function Contact({ actionData }: Route.ComponentProps) {
               a note and we'll get back to you.
             </p>
 
-            <div className="mt-8 space-y-3">
-              <a
-                href={`mailto:${SITE.email}`}
-                className="group flex items-center gap-3 text-sm text-white/70 transition-colors hover:text-white"
-              >
-                <span className="flex h-9 w-9 items-center justify-center rounded-lg border border-white/10 bg-white/[0.02] text-forge">
-                  <Mail className="h-4 w-4" />
-                </span>
-                {SITE.email}
-              </a>
-              <a
-                href={SITE.socials.github}
-                target="_blank"
-                rel="noreferrer noopener"
-                className="group flex items-center gap-3 text-sm text-white/70 transition-colors hover:text-white"
-              >
-                <span className="flex h-9 w-9 items-center justify-center rounded-lg border border-white/10 bg-white/[0.02] text-forge">
-                  <GithubIcon size={16} />
-                </span>
-                github.com/devforge-io
-              </a>
-              <a
-                href={SITE.socials.discord}
-                target="_blank"
-                rel="noreferrer noopener"
-                className="group flex items-center gap-3 text-sm text-white/70 transition-colors hover:text-white"
-              >
-                <span className="flex h-9 w-9 items-center justify-center rounded-lg border border-white/10 bg-white/[0.02] text-forge">
-                  <DiscordIcon size={16} />
-                </span>
-                Join our Discord
-              </a>
-            </div>
           </Reveal>
         </div>
 
@@ -134,7 +100,7 @@ export default function Contact({ actionData }: Route.ComponentProps) {
                   Message sent
                 </h2>
                 <p className="mt-2 max-w-xs text-sm text-white/55">
-                  Thanks for reaching out — we'll be in touch soon. Consider this
+                  Thanks for reaching out. We'll be in touch soon. Consider this
                   note struck and cooling.
                 </p>
               </div>

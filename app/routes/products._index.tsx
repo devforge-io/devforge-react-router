@@ -11,9 +11,9 @@ import { pageMeta } from "~/lib/meta";
 
 export function meta(_: Route.MetaArgs) {
   return pageMeta({
-    title: `Products — ${SITE.name}`,
+    title: `Products · ${SITE.name}`,
     description:
-      "Explore the Devforge product family: Anvil DB, Aegis, Foundry and Stencil — self-hostable developer infrastructure you own. Rust engines, React and React Native apps.",
+      "Explore the Devforge product family: Anvil DB, Aegis, Foundry and Stencil. Self-hostable developer infrastructure you own.",
     path: "/products",
   });
 }
@@ -42,7 +42,7 @@ export default function ProductsIndex() {
           </Reveal>
           <Reveal delay={0.12}>
             <p className="mt-5 max-w-2xl text-lg leading-relaxed text-white/60">
-              Four independent tools that share one philosophy — self-hostable
+              Four independent tools that share one philosophy: self-hostable
               by default, no vendor lock-in, and infrastructure you fully own.
               Pick one, or run them together.
             </p>

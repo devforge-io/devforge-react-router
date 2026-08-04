@@ -4,6 +4,7 @@ import type { Product } from "~/data/products";
 import { PRODUCTS } from "~/data/products";
 import { EmberField } from "~/components/ember-field";
 import { CodeBlock } from "~/components/code-block";
+import { DownloadCta } from "~/components/download-cta";
 import { Icon, resolveIcon } from "~/components/icon";
 import { Cta, Eyebrow, Pill, SectionHeading } from "~/components/primitives";
 import { Reveal, RevealItem, RevealStagger } from "~/components/reveal";
@@ -64,16 +65,29 @@ export function ProductPage({ product }: { product: Product }) {
                 </div>
 
                 <div className="mt-8 flex flex-wrap gap-3">
-                  {product.links.map((l) => (
-                    <Cta
-                      key={l.href}
-                      href={l.href}
-                      variant={l.kind === "primary" ? "accent" : "ghost"}
-                      accent={product.accent}
-                    >
-                      {l.label}
-                    </Cta>
-                  ))}
+                  {product.links.map((l) =>
+                    l.download ? (
+                      <DownloadCta
+                        key={l.href}
+                        href={l.href}
+                        accent={product.accent}
+                        variant="accent"
+                      >
+                        {l.label}
+                      </DownloadCta>
+                    ) : (
+                      <Cta
+                        key={l.href}
+                        {...(l.href.startsWith("/")
+                          ? { to: l.href }
+                          : { href: l.href })}
+                        variant={l.kind === "primary" ? "accent" : "ghost"}
+                        accent={product.accent}
+                      >
+                        {l.label}
+                      </Cta>
+                    ),
+                  )}
                   <Cta to="/contact" variant="ghost" arrow>
                     Talk to us
                   </Cta>
@@ -176,16 +190,29 @@ export function ProductPage({ product }: { product: Product }) {
               <span style={{ color: product.accent }}>{product.name}</span>?
             </h2>
             <div className="mt-8 flex flex-wrap justify-center gap-3">
-              {product.links.map((l) => (
-                <Cta
-                  key={l.href}
-                  href={l.href}
-                  variant={l.kind === "primary" ? "primary" : "ghost"}
-                  accent={product.accent}
-                >
-                  {l.label}
-                </Cta>
-              ))}
+              {product.links.map((l) =>
+                l.download ? (
+                  <DownloadCta
+                    key={l.href}
+                    href={l.href}
+                    accent={product.accent}
+                    variant="primary"
+                  >
+                    {l.label}
+                  </DownloadCta>
+                ) : (
+                  <Cta
+                    key={l.href}
+                    {...(l.href.startsWith("/")
+                      ? { to: l.href }
+                      : { href: l.href })}
+                    variant={l.kind === "primary" ? "primary" : "ghost"}
+                    accent={product.accent}
+                  >
+                    {l.label}
+                  </Cta>
+                ),
+              )}
               <Cta to="/contact" variant="ghost">
                 Get in touch
               </Cta>

@@ -10,14 +10,14 @@ import { pageMeta } from "~/lib/meta";
 
 export function meta(_: Route.MetaArgs) {
   return pageMeta({
-    title: `Company — ${SITE.name}`,
-    description: `${SITE.company} is a blacksmith's shop for software — building self-hostable developer infrastructure you fully own. Rust engines, React and React Native apps.`,
+    title: `Company · ${SITE.name}`,
+    description: `${SITE.company} is a blacksmith's shop for software, building self-hostable developer infrastructure you fully own.`,
     path: "/company",
   });
 }
 
 const METAPHOR = [
-  { key: "devforge", name: "Devforge", role: "The forge itself — the shop where everything is made." },
+  { key: "devforge", name: "Devforge", role: "The forge itself, the shop where everything is made." },
   ...PRODUCTS.map((p) => ({ key: p.slug, name: p.name, role: p.forgeNote })),
 ];
 
@@ -55,8 +55,8 @@ export default function Company() {
           <Reveal delay={0.16}>
             <p className="mx-auto mt-5 max-w-2xl text-lg leading-relaxed text-white/60">
               {SITE.company} builds developer infrastructure the way a smith
-              works metal — heated, shaped, and tempered until it's dependable.
-              Every tool we make is self-hostable and yours to own — no managed
+              works metal: heated, shaped, and tempered until it's dependable.
+              Every tool we make is self-hostable and yours to own, no managed
               cloud, no lock-in.
             </p>
           </Reveal>
@@ -78,12 +78,11 @@ export default function Company() {
                 you can't leave.
               </p>
               <p>
-                Devforge takes the opposite bet. We build the
-                performance-critical engines in Rust — no JVM, no
-                garbage-collection pauses — and the apps and clients in React and
-                React Native. Wherever it fits, your data lives in human-readable
-                files and Git history you control; everywhere, it's yours to
-                self-host. Standards you already know, not a walled garden.
+                Devforge takes the opposite bet. We build small, sharp tools,
+                fast where it counts and familiar everywhere else. Wherever it
+                fits, your data lives in human-readable files and history you
+                control; everywhere, it's yours to self-host. Standards you
+                already know, not a walled garden.
               </p>
               <p>
                 The result is infrastructure you can actually reason about: see
@@ -173,7 +172,7 @@ export default function Company() {
                     {p.name}
                   </span>
                   <span className="block text-xs text-white/45">
-                    {p.language}
+                    {p.eyebrow}
                   </span>
                 </span>
               </div>
@@ -202,9 +201,6 @@ export default function Company() {
             </h2>
             <div className="mt-8 flex flex-wrap justify-center gap-3">
               <Cta to="/contact">Get in touch</Cta>
-              <Cta href={SITE.socials.github} variant="ghost">
-                View our code
-              </Cta>
             </div>
           </Reveal>
         </div>

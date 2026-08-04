@@ -1,10 +1,10 @@
-import type { Route } from "./+types/products.foundry";
+import type { Route } from "./+types/products.hammer";
 import { getProduct } from "~/data/products";
 import { SITE } from "~/data/site";
 import { ProductPage } from "~/components/product-page";
 import { pageMeta } from "~/lib/meta";
 
-const SLUG = "foundry";
+const SLUG = "hammer";
 
 export function meta(_: Route.MetaArgs) {
   const p = getProduct(SLUG);
@@ -16,7 +16,7 @@ export function meta(_: Route.MetaArgs) {
   });
 }
 
-export default function FoundryRoute() {
+export default function HammerRoute() {
   const product = getProduct(SLUG);
   if (!product) throw new Response("Not found", { status: 404 });
   return <ProductPage product={product} />;

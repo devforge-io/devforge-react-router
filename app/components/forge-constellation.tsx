@@ -10,7 +10,7 @@ const CORE = { x: 50, y: 50 };
 /**
  * The home hero: each Devforge product is a node orbiting a central molten core,
  * linked by pulsing spokes. Nodes are real <Link>s to the product routes (so the
- * page still works — and is crawlable — with JS disabled). Drift is driven by a
+ * page still works, and is crawlable, with JS disabled). Drift is driven by a
  * requestAnimationFrame clock that freezes while a node is hovered, so it "locks
  * on". Backdrop + entrance use CSS keyframes and framer-motion respectively.
  *
@@ -238,7 +238,7 @@ export function ForgeConstellation() {
                   onMouseLeave={() => setHovered(null)}
                   onFocus={() => setHovered(n.i)}
                   onBlur={() => setHovered(null)}
-                  aria-label={`${n.item.name} — ${n.item.eyebrow}`}
+                  aria-label={`${n.item.name}, ${n.item.eyebrow}`}
                   className="group relative flex cursor-pointer flex-col items-center outline-none"
                   style={{
                     opacity: faded ? 0.4 : 1,
@@ -324,7 +324,7 @@ export function ForgeConstellation() {
         <p className="mx-auto h-10 max-w-md text-sm leading-relaxed text-white/55">
           {hovered !== null
             ? nodes[hovered].item.blurb
-            : "Four tools, one forge. Hover a node to preview — click to enter."}
+            : "Four tools, one forge. Hover a node to preview, click to enter."}
         </p>
       </div>
     </div>

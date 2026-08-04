@@ -16,18 +16,18 @@ export function meta(_: Route.MetaArgs) {
 const TENETS = [
   {
     icon: Zap,
-    title: "Rust & React",
-    body: "Rust engines for the hot paths; React and React Native for the apps.",
+    title: "Sharp, focused tools",
+    body: "Small tools that each do one thing well, and stay out of your way.",
   },
   {
     icon: Braces,
     title: "Open standards",
-    body: "Cypher, GraphQL, WHIP/WHEP, Git — the interfaces you already know.",
+    body: "Cypher, GraphQL, WHIP/WHEP, Git: the interfaces you already know.",
   },
   {
     icon: Server,
     title: "Self-hostable",
-    body: "Run the whole stack yourself — no sidecars, no managed cloud required.",
+    body: "Run the whole stack yourself, no sidecars, no managed cloud required.",
   },
   {
     icon: ShieldCheck,
@@ -63,18 +63,14 @@ export default function Home() {
             </Reveal>
             <Reveal delay={0.12}>
               <p className="mt-6 max-w-xl text-lg leading-relaxed text-white/60">
-                Devforge builds a small family of self-hostable tools — a graph
+                Devforge builds a small family of self-hostable tools: a graph
                 database, an egress proxy, a team-chat platform and a Git-backed
-                CMS. Rust engines for the hot paths, React and React Native for
-                the apps. Own your data; run the whole stack yourself.
+                CMS. Own your data; run the whole stack yourself.
               </p>
             </Reveal>
             <Reveal delay={0.18}>
               <div className="mt-8 flex flex-wrap gap-3">
                 <Cta to="/products">Explore the products</Cta>
-                <Cta href={SITE.socials.github} variant="ghost">
-                  View on GitHub
-                </Cta>
               </div>
             </Reveal>
           </div>
@@ -118,7 +114,7 @@ export default function Home() {
                   Four tools, <span className="text-molten">one forge</span>.
                 </>
               }
-              intro="Each product stands on its own — but they share a philosophy: self-hostable by default, no vendor lock-in, and infrastructure you fully own."
+              intro="Each product stands on its own, but they share a philosophy: self-hostable by default, no vendor lock-in, and infrastructure you fully own."
             />
           </Reveal>
 

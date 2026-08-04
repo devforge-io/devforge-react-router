@@ -14,7 +14,7 @@
   --font-mono: "Geist Mono Variable", ui-monospace, "SF Mono", "Fira Code",
     monospace;
 
-  /* Devforge master palette — molten metal on cold iron */
+  /* Devforge master palette: molten metal on cold iron */
   --color-forge: #f5a524;
   --color-forge-bright: #ffcf5c;
   --color-ember: #f97316;
@@ -94,7 +94,7 @@ body {
   border: 2px solid var(--df-bg);
 }
 
-/* Respect reduced motion — freeze the ambient loops */
+/* Respect reduced motion: freeze the ambient loops */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

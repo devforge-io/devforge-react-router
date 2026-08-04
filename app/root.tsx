@@ -13,7 +13,7 @@ import { Cta } from "~/components/primitives";
 import { pageMeta } from "~/lib/meta";
 import "./app.css";
 
-// Default meta — used on error/fallback renders. Each leaf route emits its own
+// Default meta, used on error/fallback renders. Each leaf route emits its own
 // full set via pageMeta(), because React Router does not merge parent meta.
 export function meta(_: Route.MetaArgs) {
   return pageMeta();

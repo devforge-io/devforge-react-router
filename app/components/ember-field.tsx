@@ -3,7 +3,7 @@ import { cn } from "~/lib/utils";
 
 /**
  * Ambient "forge" backdrop: a panning grid, two drifting glow clouds, a field of
- * rising embers and occasional flying sparks — all pure CSS animation (keyframes
+ * rising embers and occasional flying sparks, all pure CSS animation (keyframes
  * live in app.css). Positions/timings are derived deterministically from the
  * index so the server and client render byte-identical markup (no hydration
  * mismatch, no Math.random). Meant to sit behind content with `pointer-events-none`.
