@@ -1,90 +1,125 @@
-# Devforge marketing website
+# Devforge website
 
-The marketing site for **Devforge Pty Ltd** and its product family: **Anvil DB**,
-**Aegis**, **Foundry** and **Stencil**.
+This repository is the **workspace** for the Devforge marketing site (https://devforge.io).
+It contains no application code of its own. The site is made of two separate git
+repositories that are cloned *into* this directory and ignored by this repo's git:
 
-Built with **React Router 8** in framework mode (SSR), a multi-route content site,
-**not** a single-page app. Every page is its own server-rendered document with its
-own loader/meta and code-split bundle.
+| Path         | Repository                          | What it is                                                                                 |
+| ------------ | ----------------------------------- | ------------------------------------------------------------------------------------------ |
+| `./stencil`  | `devforge-io/devforge-stencil`      | The CMS + web server. A fork of Stencil (`devforge-io/stencil`) with Devforge customisations. |
+| `./content`  | `devforge-io/website-stencil`       | The site content: pages, components, assets and settings that Stencil reads from GitHub.     |
 
-## Stack
+Stencil is a Git-backed CMS: the running app reads content from the **GitHub** copy of
+`website-stencil` (branch `draft` for the admin UI, branch `main` for the public site),
+not from the local `./content` folder. The local clone is there so content can be edited,
+diffed and committed with normal tools. See `CLAUDE.md` for the editing and publishing
+workflow.
 
-| Concern      | Choice                                              |
-| ------------ | --------------------------------------------------- |
-| Framework    | React Router 8 (framework mode, SSR)                |
-| Routing      | `remix-flat-routes` via the routes-option-adapter   |
-| Animation    | `framer-motion` + hand-authored CSS keyframes       |
-| Styling      | Tailwind CSS v4 (`@tailwindcss/vite`)               |
-| Fonts        | Geist / Geist Mono, self-hosted via `@fontsource`   |
-| Icons        | `lucide-react` (+ inline brand glyphs)              |
-| Language     | TypeScript (strict)                                 |
+## Prerequisites
 
-## Getting started
+- Git with SSH access to the `devforge-io` GitHub organisation.
+- Node.js **22.x** (`stencil/.nvmrc` pins `22`; `nvm use` inside `./stencil` picks it up).
+- Credentials for Stencil (ask Ben, or create your own per `stencil/README.md`):
+  - a GitHub OAuth App (client id + secret) whose callback URL is `http://localhost:5174/auth/github/callback`
+  - a fine-grained GitHub token with **Contents: read/write** on `devforge-io/website-stencil`
+  - SMTP credentials for the contact form (optional for local work)
+
+## Install
+
+All commands are run from this directory (the workspace root).
+
+### 1. Clone the workspace
 
 ```bash
+git clone git@github.com:devforge-io/devforge-react-router.git devforge-website
+cd devforge-website
+```
+
+### 2. Install `./stencil` (the app)
+
+```bash
+git clone git@github.com:devforge-io/devforge-stencil.git stencil
+git -C stencil remote add upstream git@github.com:devforge-io/stencil.git
+git -C stencil remote set-url --push upstream no_push   # never push to the original by accident
+git -C stencil fetch upstream
+
+cd stencil
+nvm use            # Node 22
 npm install
-npm run dev        # http://localhost:5273
+cp .env.example .env
+cd ..
 ```
 
-> React Router 8 prefers Node ≥ 22.22. Older 22.x prints a warning but builds/serves fine.
+Fill in `stencil/.env`. The Devforge-specific values are:
 
-## Scripts
+```dotenv
+GITHUB_OWNER=devforge-io
+GITHUB_REPO=website-stencil
+GITHUB_BRANCH=draft
+GITHUB_PUBLISH_BRANCH=main
+GITHUB_CONTENT_PATH=content
+GITHUB_COMPONENT_PATH=components
+
+GITHUB_TOKEN=<fine-grained token, Contents read/write on website-stencil>
+GITHUB_OAUTH_CLIENT_ID=<OAuth App client id>
+GITHUB_OAUTH_CLIENT_SECRET=<OAuth App client secret>
+SESSION_SECRET=<any long random string>
+
+# Contact form (optional locally)
+SMTP_HOST=
+SMTP_PORT=
+SMTP_USER=
+SMTP_PASSWORD=
+SMTP_FROM=
+```
+
+`GITHUB_TOKEN` is what lets anonymous visitors see the public site, and what the
+admin UI uses to commit to `website-stencil`. Sign-in roles come from the user's
+permission on `website-stencil` (admin, maintain, write).
+
+### 3. Install `./content` (the site content)
 
 ```bash
-npm run dev         # dev server (HMR)
-npm run build       # production build (client + server bundles)
-npm run start       # serve the production build
-npm run typecheck   # react-router typegen && tsc
+git clone git@github.com:devforge-io/website-stencil.git content
+git -C content checkout draft
 ```
 
-## Routes
+Always work on **`draft`**. `main` is written only by Stencil's Publish action
+(details in `CLAUDE.md`).
 
-Routing is file-based (`app/routes/`, resolved by `remix-flat-routes`):
+### 4. Run it
 
-| File                         | URL                     |
-| ---------------------------- | ----------------------- |
-| `_index.tsx`                 | `/`                     |
-| `products._index.tsx`        | `/products`             |
-| `products.anvil-db.tsx`      | `/products/anvil-db`    |
-| `products.aegis.tsx`         | `/products/aegis`       |
-| `products.foundry.tsx`       | `/products/foundry`     |
-| `products.stencil.tsx`       | `/products/stencil`     |
-| `company.tsx`                | `/company`              |
-| `contact.tsx`                | `/contact` (+ `action`) |
-| `$.tsx`                      | catch-all 404           |
+```bash
+cd stencil
+npm run dev        # http://localhost:5174
+```
 
-## Architecture
+- `http://localhost:5174/` is the public site, served from `website-stencil@main`.
+- `http://localhost:5174/content` is the admin UI (sign in with GitHub), served from `website-stencil@draft`.
 
-- **`app/data/products.ts`**, the single product catalogue that drives the home
-  constellation, the `/products` grid and every product page. Product routes are
-  thin: they read from this catalogue and render the shared `ProductPage` template.
-- **`app/data/site.ts`**, company details, nav and footer links.
-- **`app/components/forge-constellation.tsx`**, the animated home hero: products
-  orbit a molten core on a `requestAnimationFrame` clock, each node a real `<Link>`
-  (so it works and is crawlable without JS). Adapted from a constellation-nav
-  experiment and re-themed for the forge.
-- **`app/components/ember-field.tsx`**, the reusable ambient backdrop (rising
-  embers, sparks, panning grid, glow). Positions are derived deterministically from
-  the index so server and client render identically, no hydration mismatch.
-- **`app/components/reveal.tsx`**, framer-motion scroll-reveal wrappers.
-- **`app/app.css`**, Tailwind theme tokens, the forge palette and all keyframes.
+Other scripts inside `./stencil`:
 
-### Design language
+```bash
+npm run typecheck  # react-router typegen && tsc
+npm test           # node --test over app/**/*.test.ts
+npm run build      # production build
+npm start          # serve the production build
+```
 
-A "forge-punk" fusion: dark iron backgrounds, molten-metal accents (gold → orange →
-red), HUD framing, and a rising-ember particle field. Each product carries its own
-accent, Anvil `#4f8fea`, Aegis `#2dd4bf`, Foundry `#fb923c`, Stencil `#d946ef`.
+## Layout after install
 
-The whole UI honours `prefers-reduced-motion` (ambient loops freeze).
+```
+.
+├── README.md            this file
+├── CLAUDE.md            working rules for content edits, publishing and fork updates
+├── .gitignore           ignores ./stencil and ./content
+├── stencil/             git repo: devforge-io/devforge-stencil  (remotes: origin, upstream)
+└── content/             git repo: devforge-io/website-stencil    (branches: draft, main)
+    ├── content/         *.page files, index.css, pages.json, assets/, files/
+    ├── components/      reusable component JSON (inlined into pages)
+    └── settings.json    site settings (name, url, OG image, body classes)
+```
 
-## Notes
-
-- The contact form validates **server-side** in a React Router `action`, so it works
-  with or without client JavaScript. Wire the send step (Resend / webhook / queue)
-  where the `TODO` comment sits in `app/routes/contact.tsx`.
-- Product feature copy is drawn from each product's own repo/README.
-- **Meta/SEO:** every route builds its tags with `pageMeta()` (`app/lib/meta.ts`).
-  React Router renders only the leaf route's `meta` (child replaces parent, no
-  merge), so the shared helper emits the full Open Graph / Twitter / canonical /
-  JSON-LD set per page. The social card is `public/og.png` (1200×630).
-- `© 2026 Devforge Pty Ltd.`
+Each of the three directories (`.`, `./stencil`, `./content`) is its own git repository.
+Run git with `-C stencil` or `-C content` (or `cd` first); running `git status` here
+only shows the workspace files.

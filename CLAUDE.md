@@ -1,0 +1,186 @@
+# CLAUDE.md
+
+Working rules for the Devforge website workspace. Read this before changing anything.
+
+## 1. What lives where
+
+This root repo holds **only** `README.md`, `CLAUDE.md` and `.gitignore`. The real work
+happens in two nested, gitignored clones. Each is its own git repository with its own
+remote, branches and history. `git status` at the root will never show their changes.
+
+| Path        | Remote(s)                                                                      | Branch to work on                         |
+| ----------- | ------------------------------------------------------------------------------ | ----------------------------------------- |
+| `./content` | `origin` = `devforge-io/website-stencil`                                       | `draft` (always). `main` is publish-only. |
+| `./stencil` | `origin` = `devforge-io/devforge-stencil` (our fork), `upstream` = `devforge-io/stencil` (original) | `main`                                    |
+
+Always address them explicitly: `git -C content ...`, `git -C stencil ...`.
+
+Style rule for everything written for Ben (copy, docs, commit messages): **no em dashes**.
+Use a comma, colon, parentheses or a full stop instead.
+
+Stencil reads content from **GitHub**, not from `./content` on disk. A local edit is
+invisible to the running app (and to the live site) until it is pushed to `draft`, and
+invisible to the public until it is **published** to `main`.
+
+## 2. Editing content (`./content`)
+
+### 2.1 The draft -> main rule
+
+- `draft` is the working branch. Every edit, by hand or through the Stencil admin UI, lands here.
+- `main` is the published branch. The public site, the JSON API and embeds serve from it.
+- **`main` is only ever written by Stencil's Publish / Unpublish actions.** Publishing is
+  a per-file copy: Stencil reads the file from `draft` and writes it to `main` through the
+  GitHub API with a commit like `Publish <slug>` (plus `Publish asset <file>`, the compiled
+  CSS for pages, and an index update). It is not a git merge.
+
+Therefore, in `./content`:
+
+- Do **not** `git merge draft` into `main`.
+- Do **not** `git pull` / `git rebase` / `git cherry-pick` from `draft` onto `main`.
+- Do **not** push directly to `main`, and do not fast-forward it.
+- Do **not** resolve "draft is ahead of main" by syncing branches. That state is normal; it
+  means there is unpublished work. Publish what is ready, leave the rest.
+
+Why: a merge would publish every unfinished draft at once, skip the compiled CSS, asset
+and index steps Stencil performs on publish, and bypass the role check (only Admin or
+Moderator may publish). Stencil's "Unpublished changes" badge and `/content/:slug/history`
+compare file blob SHAs between the two branches, so `main` must only contain what was
+deliberately published.
+
+### 2.2 Workflow for a content change
+
+1. `git -C content checkout draft && git -C content pull` (make sure you are on `draft`).
+2. Edit the files (see 2.3). Keep unrelated files byte-identical.
+3. Commit on `draft` with a plain message describing the change.
+4. Push `draft` only when Ben asks (pushing makes the change visible in the admin UI at once).
+5. Publish through Stencil: run `npm run dev` in `./stencil`, open
+   `http://localhost:5174/content`, open the page, click **Publish** (or **Publish Changes**).
+   Publish each affected page; assets referenced by a page are published with it.
+6. Confirm: `git -C content fetch && git -C content log --oneline origin/main -5` should show the
+   `Publish <slug>` commits, and `git -C content diff origin/main origin/draft --stat` should
+   list only work that is intentionally still unpublished.
+
+### 2.3 Content file facts
+
+- `content/<slug>.page` = YAML frontmatter (`title`, `description`, `ogImage`, `path`,
+  `contentType: page`) followed by a JSON body `{ "html": "...", "css": "..." }`. Routing is by
+  the `path` field (`/` is the home page). Files use 2-space indent and no trailing newline.
+- `components/<slug>.json` = `{ meta: {slug, name, category, description, type: "static"},
+  html, css, pages: [...] }`. Static components are **inlined verbatim** into every page that
+  uses them, marked with `data-pb-component="<slug>"` on the root element. There is no
+  runtime component registry.
+- **One change, two files.** Editing a component means editing `components/<slug>.json`
+  *and* the identical copy inside every `content/<page>.page` listed in its `pages[]` (the
+  `site-header` and `site-footer` components are in all pages). Edit by text splice on the
+  JSON-escaped string so the rest of the file stays byte-for-byte; do not parse and re-dump.
+- `content/index.css` is the hand-written stylesheet; each page's `css` field is a per-page
+  copy, so prefer existing classes and inline styles over adding new CSS.
+- `content/pages.json`, `components/components.json`, `content/tutorial.json` are indexes
+  used by the admin listings. Add a new page to `pages.json`; the public site discovers pages
+  by scanning the content dir, not by this index.
+- Assets live in `content/assets/` and are referenced as `/api/assets/<file>` (they only
+  resolve through the running Stencil app). Uploads served at custom URLs live in
+  `content/files/` with `content/files.json`.
+- `settings.json` holds site name, URL, default OG image, body classes, locale.
+- A page may not claim these URL prefixes (`RESERVED_PREFIXES` in
+  `stencil/app/lib/file-uploads.server.ts`): `/content /api /embed /guide /login /logout
+  /components /settings /articles /tutorial /files /.well-known /robots.txt /sitemap.xml
+  /llms.txt`. Fork routes also shadow any CMS page at the same path (for example
+  `/tools/website-audit` is a fork route while `/tools` itself is a CMS page).
+- `.page` files are **static HTML + CSS only**. Anything needing a server action, a loader,
+  a resource route or live React goes into the `./stencil` fork as a route (section 3.3).
+
+## 3. The Stencil fork (`./stencil`)
+
+### 3.1 What it is
+
+`origin` (`devforge-io/devforge-stencil`) is a fork of the original Stencil
+(`upstream` = `devforge-io/stencil`). The fork's `main` is upstream `main` plus a stack of
+Devforge customisations on top. Local customisations so far:
+
+- `/tools/website-audit` (audit engine under `app/lib/audit/`, UI under
+  `app/components/tools/audit/`, routes under `app/routes/tools+/` including the PDF report
+  and the OG proxy), with CSRF helpers `app/lib/csrf.server.ts` + `app/components/csrf-input.tsx`.
+- Site chrome for fork routes: `app/lib/site-chrome.server.ts` (pulls the header/footer
+  components out of the content repo).
+- SEO/security: `robots.txt`, `sitemap.xml`, `llms.txt` routes, full social metadata and
+  baseline security headers in `app/root.tsx` / `app/lib/public-page.server.ts`.
+- Small edits to `app/lib/settings.server.ts` and `app/lib/file-uploads.server.ts`, and
+  extra dependencies in `package.json` (`pdfkit`, `@types/pdfkit`).
+
+See exactly what is custom at any time:
+
+```bash
+git -C stencil fetch upstream
+git -C stencil log --oneline upstream/main..main        # our commits
+git -C stencil diff --stat upstream/main main           # our files
+```
+
+### 3.2 Pulling updates from the original without losing the customisations
+
+Use a **merge**, not a reset and not a force-push. A merge keeps our commits, keeps
+`origin/main` fast-forwardable for anything deployed from it, and makes conflicts explicit.
+
+```bash
+cd stencil
+git checkout main && git pull origin main        # start from the fork's current state
+git fetch upstream
+git log --oneline main..upstream/main            # what is new upstream (review it first)
+git merge upstream/main                          # bring it in on top of our customisations
+```
+
+If there are conflicts:
+
+- Our customisations win for files that only we touched (the audit tool, tools routes,
+  csrf, site-chrome). Upstream wins for files we never changed.
+- Shared files that need a real merge: `app/root.tsx`, `app/lib/public-page.server.ts`,
+  `app/lib/settings.server.ts`, `app/lib/file-uploads.server.ts`, `package.json`. Keep both
+  sides' intent; never drop a Devforge addition to make a conflict go away.
+- `package-lock.json`: take upstream's version (`git checkout --theirs package-lock.json`),
+  then run `npm install` so the fork's extra dependencies are re-added, and stage the result.
+
+Then verify and push to the fork:
+
+```bash
+npm install
+npm run typecheck && npm test && npm run build
+git push origin main
+```
+
+Never:
+
+- `git reset --hard upstream/main`, `git checkout upstream/main -- <file>` on a customised
+  file, or `git push --force` to `origin/main`. All of these discard customisations.
+- push to `upstream`. The push URL is set to `no_push` on purpose
+  (`git -C stencil remote set-url --push upstream no_push`); leave it that way.
+- commit `.env`, `build/`, `.react-router/`, or `node_modules/` (all gitignored).
+
+To send a change back to the original Stencil, make it in a branch based on `upstream/main`
+(or in the separate original checkout) and open a PR against `devforge-io/stencil`. Do not
+push fork-only Devforge features upstream.
+
+### 3.3 Writing a route in the fork
+
+Use `app/routes/contact/route.tsx` (content supplies the design, the fork supplies the
+action) or `app/routes/tools+/website-audit/route.tsx` (fully hand-written public page with
+site chrome) as the template. Known traps:
+
+1. Stencil's `<body>` is light-themed and `App()` is a bare `<Outlet />`; a Devforge-looking
+   page must paint its own dark shell and pull the header/footer via `site-chrome.server.ts`.
+2. The Tailwind `@theme` has no forge/molten/ember tokens (only `brand-*`); use literal hex
+   values in fork-local components, do not edit the shared `app.css` for one route.
+3. `Layout` hardcodes `<title>Stencil CMS</title>` before `<Meta />`, so a route's `meta()`
+   title renders as a second `<title>`.
+4. There is no global CSRF plumbing: mint the token in the route's own loader and pass it
+   down, as the audit tool does.
+
+Routing is `remix-flat-routes`: `route.tsx` per folder, `+` folders are path segments,
+`[.]` escapes dots (`robots[.]txt`), `$` is a param, `_` prefix is a pathless layout.
+
+## 4. Before you finish any task
+
+- Content change: edited component JSON **and** every page copy; committed on `draft`;
+  noted that it still needs a push + Publish (or did them, if asked).
+- Fork change: `npm run typecheck` and `npm test` pass in `./stencil`; commit on `main`;
+  push to `origin` only when asked; never to `upstream`.
+- Root repo: only `README.md`, `CLAUDE.md`, `.gitignore` (and `.claude/`) belong here.

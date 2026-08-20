@@ -1,20 +1,18 @@
-node_modules/
-
-# React Router
-/.react-router/
-/build/
-
-# Env
-.env
-.env.local
-.env.*.local
-
-# Logs
-*.log
-npm-debug.log*
+# The two real codebases live here as separate git clones (see README.md).
+# They are never tracked by this repo.
+/stencil/
+/content/
 
 # Editor / OS
 .DS_Store
 .idea/
 .vscode/
 *.swp
+
+# Local Claude Code state
+.claude/settings.local.json
+.claude/.cc-writes/
+
+# Logs
+*.log
+npm-debug.log*
