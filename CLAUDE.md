@@ -63,16 +63,32 @@ deliberately published.
 ### 2.3 Content file facts
 
 - `content/<slug>.page` = YAML frontmatter (`title`, `description`, `ogImage`, `path`,
-  `contentType: page`) followed by a JSON body `{ "html": "...", "css": "..." }`. Routing is by
-  the `path` field (`/` is the home page). Files use 2-space indent and no trailing newline.
+  `contentType: page`) followed by a JSON body. Routing is by the `path` field (`/` is the
+  home page). Two shapes exist:
+  - hand-generated pages: `{ "html", "css" }` only;
+  - pages saved through the Stencil page builder (currently `index.page`): the full builder
+    project `{ "version", "root", "canvasScripts", "canvasStyles", "html", "css" }`, pretty
+    printed with 2-space indent and `\uXXXX` escapes (Python `json.dumps(obj, indent=2)`
+    round-trips it byte for byte). `root` is the node tree the builder edits; `html` is what
+    the public site serves. **If a page has `root`, keep `root` and `html` in step**, or the
+    next save in the builder regenerates `html` from the stale tree and drops your edit.
 - `components/<slug>.json` = `{ meta: {slug, name, category, description, type: "static"},
-  html, css, pages: [...] }`. Static components are **inlined verbatim** into every page that
-  uses them, marked with `data-pb-component="<slug>"` on the root element. There is no
-  runtime component registry.
-- **One change, two files.** Editing a component means editing `components/<slug>.json`
-  *and* the identical copy inside every `content/<page>.page` listed in its `pages[]` (the
-  `site-header` and `site-footer` components are in all pages). Edit by text splice on the
-  JSON-escaped string so the rest of the file stays byte-for-byte; do not parse and re-dump.
+  html, css, pages: [...] }`, pretty printed (2-space, `ensure_ascii=False`, no trailing
+  newline). Components saved through the builder also carry `projectData`: a compact JSON
+  string of `{version, root}` whose `root.children[0]` must equal the same component's subtree
+  inside each page's `root`. Same rule: when `projectData` exists, update it alongside `html`.
+  Node ids in a page tree must be unique; mint new ids with a fresh prefix (e.g.
+  `pb-<something>-N`) rather than reusing neighbours' ids. Static components are **inlined
+  verbatim** into every page that uses them, marked with `data-pb-component="<slug>"` on the
+  root element. There is no runtime component registry.
+- **One change, two files (sometimes four representations).** Editing a component means
+  editing `components/<slug>.json` *and* the identical copy inside every `content/<page>.page`
+  listed in its `pages[]` (the `site-header` and `site-footer` components are in all pages),
+  and, where they exist, the component's `projectData` tree and the page's `root` subtree.
+  For the `{html, css}`-only files edit by text splice on the JSON-escaped string so the rest
+  stays byte-for-byte; for the builder-format files, parse, verify the round-trip reproduces
+  the original bytes, edit, and re-dump with the same settings. Before committing, assert that
+  the component html still appears exactly once in each page html.
 - `content/index.css` is the hand-written stylesheet; each page's `css` field is a per-page
   copy, so prefer existing classes and inline styles over adding new CSS.
 - `content/pages.json`, `components/components.json`, `content/tutorial.json` are indexes
