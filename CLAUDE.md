@@ -52,13 +52,14 @@ deliberately published.
 1. `git -C content checkout draft && git -C content pull` (make sure you are on `draft`).
 2. Edit the files (see 2.3). Keep unrelated files byte-identical.
 3. Commit on `draft` with a plain message describing the change.
-4. Push `draft` only when Ben asks (pushing makes the change visible in the admin UI at once).
-5. Publish through Stencil: run `npm run dev` in `./stencil`, open
-   `http://localhost:5174/content`, open the page, click **Publish** (or **Publish Changes**).
-   Publish each affected page; assets referenced by a page are published with it.
-6. Confirm: `git -C content fetch && git -C content log --oneline origin/main -5` should show the
-   `Publish <slug>` commits, and `git -C content diff origin/main origin/draft --stat` should
-   list only work that is intentionally still unpublished.
+4. Push `draft` when Ben asks (pushing makes the change visible in the admin UI at once).
+5. **Publishing is Ben's job. Claude never publishes.** Ben opens the Stencil admin
+   (`/content`), opens the page and clicks **Publish** / **Publish Changes**. Assets referenced
+   by a page are published with it. When reporting a finished content change, say which
+   pages need publishing and stop there.
+6. To check what is live vs pending: `git -C content fetch && git -C content log --oneline
+   origin/main -5` shows the `Publish <slug>` commits, and
+   `git -C content diff origin/main origin/draft --stat` lists what is still unpublished.
 
 ### 2.3 Content file facts
 
@@ -195,8 +196,9 @@ Routing is `remix-flat-routes`: `route.tsx` per folder, `+` folders are path seg
 
 ## 4. Before you finish any task
 
-- Content change: edited component JSON **and** every page copy; committed on `draft`;
-  noted that it still needs a push + Publish (or did them, if asked).
+- Content change: edited component JSON **and** every page copy (and builder trees);
+  committed on `draft`; pushed if asked; listed the pages Ben needs to publish. Never
+  published anything yourself.
 - Fork change: `npm run typecheck` and `npm test` pass in `./stencil`; commit on `main`;
   push to `origin` only when asked; never to `upstream`.
 - Root repo: only `README.md`, `CLAUDE.md`, `.gitignore` (and `.claude/`) belong here.
