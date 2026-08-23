@@ -221,6 +221,11 @@ routes under `app/routes/tools+/feature-requests+/`. Setup and operations are in
   limits. `embed.js` is served from a string (`embed-script.ts`), cached at the edge.
 - Fork routes that embed CMS chrome must render `<TailwindCdn />` (the header/footer are
   styled with utilities the fork's own Tailwind build does not generate).
+- Route **components** must never import from a `*.server` module, not even a constant or a
+  type used as a value cast: React Router strips server code from `loader`/`action` only, and
+  Vercel's build fails with "Server-only module referenced by client". Put shared constants in
+  a plain module (for example `feature-requests/shared.ts`) and use `import type` for types.
+  Run `npm run build` (not just `typecheck`) before pushing the fork; it reproduces the error.
 
 ### 3.4 Writing a route in the fork
 
