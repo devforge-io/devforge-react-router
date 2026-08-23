@@ -69,9 +69,12 @@ deliberately published.
   - hand-generated pages: `{ "html", "css" }` only;
   - pages saved through the Stencil page builder (currently `index.page`): the full builder
     project `{ "version", "root", "canvasScripts", "canvasStyles", "html", "css" }`, pretty
-    printed with 2-space indent and `\uXXXX` escapes (Python `json.dumps(obj, indent=2)`
-    round-trips it byte for byte). `root` is the node tree the builder edits; `html` is what
-    the public site serves. **If a page has `root`, keep `root` and `html` in step**, or the
+    printed with 2-space indent. The exact bytes depend on who last wrote the file (Stencil
+    writes `JSON.stringify(obj, null, 2)` after a blank line and keeps non-ASCII literal; a
+    Python script may have used `\uXXXX` escapes), so before editing, find the
+    `json.dumps(...)` settings that reproduce the current file byte for byte and assert on it;
+    never assume. `root` is the node tree the builder edits; `html` is what the public site
+    serves. **If a page has `root`, keep `root` and `html` in step**, or the
     next save in the builder regenerates `html` from the stale tree and drops your edit.
 - `components/<slug>.json` = `{ meta: {slug, name, category, description, type: "static"},
   html, css, pages: [...] }`, pretty printed (2-space, `ensure_ascii=False`, no trailing
