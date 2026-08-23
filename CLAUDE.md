@@ -219,6 +219,11 @@ routes under `app/routes/tools+/feature-requests+/`. Setup and operations are in
 - Public JSON API under `/tools/feature-requests/api/*` is CORS-enabled: reads are open,
   writes honour the project's origin allow-list, honeypot field `website`, in-memory rate
   limits. `embed.js` is served from a string (`embed-script.ts`), cached at the edge.
+- **Never run ad-hoc writes or deletes against the hosted Anvil.** On 2026-08-24 a probe
+  cleanup `MATCH (n) WHERE n:A OR n:B DETACH DELETE n` matched every node on Anvil 0.1.0 and
+  wiped all tool data. Label filters belong in the MATCH pattern (`MATCH (n:FRProbe {...})`),
+  never in `WHERE`; experiments go against a scratch database, never the one holding data;
+  and the tool's own code only deletes with label + property patterns (keep it that way).
 - Fork routes that embed CMS chrome must render `<TailwindCdn />` (the header/footer are
   styled with utilities the fork's own Tailwind build does not generate).
 - Route **components** must never import from a `*.server` module, not even a constant or a
