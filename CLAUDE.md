@@ -208,8 +208,10 @@ routes under `app/routes/tools+/feature-requests+/`. Setup and operations are in
 - Anvil 0.1.0 quirks the code works around, do not "clean them up": query parameters only
   bind in MATCH map patterns, so values are inlined via `lit()`/`mapLit()`/`setLit()` and ids
   pass `ident()`; list properties do not round-trip (origins are a space-joined string);
-  `CREATE … RETURN` returns a summary row; `MATCH … CREATE` chains do not create; relationship
-  traversal is unreliable, so the model is flat (`projectId`/`requestId` properties);
+  `CREATE … RETURN` returns a summary row; `MATCH … CREATE` chains do not create; unpatched
+  servers drop relationships created between MATCHed nodes, so queries match on
+  `projectId`/`requestId` properties while writes also MERGE the `FOR_PROJECT`/`FOR_REQUEST`
+  edges best-effort;
   `ORDER BY`/`LIMIT` sort is unreliable, so sorting happens in the store; `\uXXXX` escapes
   are not decoded; and an escaped quote followed by `//` inside a literal is read as a comment
   (`lit()` switches delimiters or inserts a zero-width space).
