@@ -205,16 +205,14 @@ routes under `app/routes/tools+/feature-requests+/`. Setup and operations are in
 - Data and accounts live in **Anvil DB** (`ANVIL_URL` + `ANVIL_SERVICE_KEY`, or admin
   user/password, in `.env`; never commit the key). People sign up and sign in through Anvil's
   own `/auth/*` endpoints; after that the app trusts its own signed `_fr_session` cookie.
-- Anvil 0.1.0 quirks the code works around, do not "clean them up": query parameters only
-  bind in MATCH map patterns, so values are inlined via `lit()`/`mapLit()`/`setLit()` and ids
-  pass `ident()`; list properties do not round-trip (origins are a space-joined string);
-  `CREATE … RETURN` returns a summary row; `MATCH … CREATE` chains do not create; unpatched
-  servers drop relationships created between MATCHed nodes, so queries match on
-  `projectId`/`requestId` properties while writes also MERGE the `FOR_PROJECT`/`FOR_REQUEST`
-  edges best-effort;
-  `ORDER BY`/`LIMIT` sort is unreliable, so sorting happens in the store; `\uXXXX` escapes
-  are not decoded; and an escaped quote followed by `//` inside a literal is read as a comment
-  (`lit()` switches delimiters or inserts a zero-width space).
+- Storage is Anvil's **document store** (2026-08-25, Ben's call): collections `fr_projects`,
+  `fr_requests`, `fr_votes` via the `/docs/*` REST API, created automatically on first use;
+  the graph view comes from Anvil's document-graph sync on the server and is never written by
+  this code. Do not reintroduce Cypher writes for tool data. The Cypher client
+  (`cypher()`/`lit()`/`ident()`) stays for auth flows and tooling; its Anvil 0.1.0 quirks
+  (parameters only bind in MATCH map patterns, summary-only `CREATE ... RETURN`, unreliable
+  `ORDER BY`/`LIMIT`, undecoded `\uXXXX`, the escaped-quote-then-`//` lexer bug) are
+  documented in the fork's FEATURE-REQUESTS.md and git history.
 - `/auth/register` needs an admin-role principal. If the service key is not admin, password
   sign-up reports that and the emailed-code path (`/auth/otp/*`) is the way in; Anvil must have
   email configured and `allow_otp_registration` on for new accounts that way.
