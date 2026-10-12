@@ -211,8 +211,9 @@ routes under `app/routes/tools+/feature-requests+/`. Setup and operations are in
   Stencil's `loginUrl` setting (Settings > General) points `/login` at `/account/sign-in`; the CMS
   GitHub sign-in is `/content/login`. `safeNext` accepts any same-site path except the auth pages.
   The account lives in the Anvil app `devforge` (`ANVIL_APP`, `app/lib/account/anvil-app.server.ts`):
-  sign-up and code requests name it so its email templates apply, and every sign-in enrols the person
-  as a `reader` member (never downgrading an existing member). The tool's board and widget flows keep
+  sign-up (emailed code only since 2026-10-13: the site never sets a password) and sign-in code requests
+  name it so its email templates apply, and every sign-in enrols the person as a `reader` member (never
+  downgrading an existing member). The tool's board and widget flows keep
   `app: feature_requests`. Anvil accounts are global; membership is bookkeeping, not an access gate.
 - **Roles are Devforge's own** (since 2026-10-12): rows in Anvil `app_devforge.roles` **keyed by UUID**, each
   with a stable `slug` (`admin`, `client`, `member` are seeded from `app/lib/account/roles.ts`; admins add more
@@ -248,9 +249,9 @@ routes under `app/routes/tools+/feature-requests+/`. Setup and operations are in
   (parameters only bind in MATCH map patterns, summary-only `CREATE ... RETURN`, unreliable
   `ORDER BY`/`LIMIT`, undecoded `\uXXXX`, the escaped-quote-then-`//` lexer bug) are
   documented in the fork's FEATURE-REQUESTS.md and git history.
-- `/auth/register` needs an admin-role principal. If the service key is not admin, password
-  sign-up reports that and the emailed-code path (`/auth/otp/*`) is the way in; Anvil must have
-  email configured and `allow_otp_registration` on for new accounts that way.
+- Sign-up never calls the admin-only `/auth/register`: a new account is created by
+  `/auth/otp/verify`, which needs Anvil's email configured and `allow_otp_registration` on
+  (server-wide or on the `devforge` app). `anvilRegister` stays in the Anvil client for tooling.
 - Public JSON API under `/tools/feature-requests/api/*` is CORS-enabled: reads are open,
   writes honour the project's origin allow-list, honeypot field `website`, in-memory rate
   limits. `embed.js` is served from a string (`embed-script.ts`), cached at the edge.
