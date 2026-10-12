@@ -16,3 +16,6 @@
 # Logs
 *.log
 npm-debug.log*
+
+# Local scratch notes, never tracked
+/tmp/

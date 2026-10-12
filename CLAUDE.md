@@ -121,10 +121,10 @@ deliberately published.
 - A page may not claim these URL prefixes (`RESERVED_PREFIXES` in
   `stencil/app/lib/file-uploads.server.ts`): `/content /api /embed /guide /login /logout
   /components /settings /articles /tutorial /files /.well-known /robots.txt /sitemap.xml
-  /llms.txt`. Fork routes also shadow any CMS page at the same path (for example
+  /llms.txt /account`. Fork routes also shadow any CMS page at the same path (for example
   `/tools/website-audit` is a fork route while `/tools` itself is a CMS page).
 - `.page` files are **static HTML + CSS only**. Anything needing a server action, a loader,
-  a resource route or live React goes into the `./stencil` fork as a route (section 3.3).
+  a resource route or live React goes into the `./stencil` fork as a route (section 3.5).
 
 ## 3. The Stencil fork (`./stencil`)
 
@@ -141,6 +141,8 @@ Devforge customisations on top. Local customisations so far:
   components out of the content repo).
 - SEO/security: `robots.txt`, `sitemap.xml`, `llms.txt` routes, full social metadata and
   baseline security headers in `app/root.tsx` / `app/lib/public-page.server.ts`.
+- Hammer licence sales (section 3.4): `/products/hammer/purchase`, `/account/licenses`,
+  `/api/stripe/webhook`, `app/lib/licensing/`.
 - Small edits to `app/lib/settings.server.ts` and `app/lib/file-uploads.server.ts`, and
   extra dependencies in `package.json` (`pdfkit`, `@types/pdfkit`).
 
@@ -198,10 +200,37 @@ push fork-only Devforge features upstream.
 ### 3.3 The feature-requests tool (`/tools/feature-requests`)
 
 Fork-only tool, added 2026-08-24. Code: `app/lib/feature-requests/` (Anvil client,
-session cookie, store, HTTP helpers, embed script), `app/components/tools/feature-requests/`,
+store, HTTP helpers, embed script), `app/components/tools/feature-requests/`,
 routes under `app/routes/tools+/feature-requests+/`. Setup and operations are in the fork's
 `FEATURE-REQUESTS.md`. Facts that are easy to get wrong:
 
+- **Sign-in is site-wide** (since 2026-10-11): the Devforge account pages are `/account` (hub),
+  `/account/sign-in`, `/account/sign-up`, `/account/sign-out` (`app/routes/account+/`; helpers in
+  `app/lib/account/`, where `paths.ts` is client-safe and `session.server.ts` holds the `_fr_session`
+  cookie). The tool's old `sign-in`/`sign-up` URLs redirect there and `/project` links there.
+  Stencil's `loginUrl` setting (Settings > General) points `/login` at `/account/sign-in`; the CMS
+  GitHub sign-in is `/content/login`. `safeNext` accepts any same-site path except the auth pages.
+  The account lives in the Anvil app `devforge` (`ANVIL_APP`, `app/lib/account/anvil-app.server.ts`):
+  sign-up and code requests name it so its email templates apply, and every sign-in enrols the person
+  as a `reader` member (never downgrading an existing member). The tool's board and widget flows keep
+  `app: feature_requests`. Anvil accounts are global; membership is bookkeeping, not an access gate.
+- **Roles are Devforge's own** (since 2026-10-12): rows in Anvil `app_devforge.roles` **keyed by UUID**, each
+  with a stable `slug` (`admin`, `client`, `member` are seeded from `app/lib/account/roles.ts`; admins add more
+  at `/account/people`), never Anvil's server roles or app privileges. Code, the cookie and
+  `requireAccountRole(request, ["admin"])` speak in slugs; rows link by UUID (`accounts.server.ts` resolves
+  one to the other, never hard-code a role UUID). An assignment is a row in `app_devforge.accounts` keyed by
+  user id holding only `user_id`, `role_id` (UUID), `set_by`, `set_at` and timestamps; no row means `member`.
+  **Do not copy email, username or sign-in times into it**: they live in `auth.users` and are joined at read
+  time (`listPeople()`). Sign-in reads the role (no write); the guard checks the assigned role live
+  (one-minute cache) and answers 403. `ACCOUNT_ADMINS` (env, comma-separated emails) are admins regardless,
+  which bootstraps the first one. Gate new pages with `requireAccountRole`, never with a role check on the
+  cookie alone.
+- **The header's profile menu is client-side** (since 2026-10-12): public pages are edge-cached for everyone,
+  so the `site-header` component in `./content` stays static. It carries a `[data-account-menu]` slot with a
+  Sign in link (desktop only) and an inline `<script>` (a builder text node with tag `script`, kept inside
+  `<header>` so `site-chrome.server.ts` extracts it) that asks `GET /account/me` and renders the dropdown.
+  The fork sets a plain `df_account=1` cookie at sign-in purely as a draw-the-button-first hint. Changing the
+  menu means editing the component plus all page copies and the `index`/`anvil-db` builder trees (section 2.3).
 - Data and accounts live in **Anvil DB** (`ANVIL_URL` + `ANVIL_SERVICE_KEY`, or admin
   user/password, in `.env`; never commit the key). People sign up and sign in through Anvil's
   own `/auth/*` endpoints; after that the app trusts its own signed `_fr_session` cookie.
@@ -232,7 +261,34 @@ routes under `app/routes/tools+/feature-requests+/`. Setup and operations are in
   a plain module (for example `feature-requests/shared.ts`) and use `import type` for types.
   Run `npm run build` (not just `typecheck`) before pushing the fork; it reproduces the error.
 
-### 3.4 Writing a route in the fork
+### 3.4 Hammer licence sales (`/products/hammer/purchase`)
+
+Fork-only, added 2026-10-12. Code: `app/lib/licensing/` (hallmark admin client, Stripe REST
+client, Anvil ownership store, reconcile), pages under `app/routes/products+/hammer+/`,
+`app/routes/account+/licenses/`, webhook `app/routes/api+/stripe.webhook/`. Operations doc:
+the fork's `HAMMER-LICENSING.md`. Facts that are easy to get wrong:
+
+- A purchase is a **yearly Stripe subscription, US$100 per key, one seat per key** (one key
+  per computer). Keys are minted by **hallmark** (`anvil/licensing`, live at
+  `licensing.devforge.io:8443`) through its admin API; hallmark is the source of truth for a
+  key, Anvil `app_devforge.licenses` only records who owns it. Keys never expire: renewal
+  needs nothing, cancellation or non-payment **revokes**.
+- Everything goes through one idempotent `reconcileSubscription()` (webhook, success page,
+  duplicates, retries). Do not add a second code path that issues keys. A per-subscription
+  lease in `app_devforge.locks` serialises concurrent runs; the webhook answers 503 when busy
+  so Stripe retries.
+- `HALLMARK_PUBLIC_KEY` in the fork must equal the key Hammer embeds (GitHub secret
+  `HAMMER_LICENSE_PUBKEY` on `devforge-io/hammer-client`) and the running service's
+  `/v1/public-key`. The private `signing_key` never leaves the licensing host.
+- Stripe's live account (AU, default AUD) carries the USD price; the page copy comes from
+  `HAMMER_PLAN` in `licensing/shared.ts`, not from Stripe. Change both together.
+- Every absolute URL licensing hands out (Checkout success/cancel, Portal return, the link in the
+  keys email) comes from `stripeReturnOrigin(request)` in `licensing/stripe.server.ts`:
+  `STRIPE_RETURN_ORIGIN` when set (production only), else the request's own origin. Licensing
+  never reads `PUBLIC_ORIGIN` and never hard-codes devforge.io: a test purchase from localhost
+  must come back to localhost, and devforge.io is for live purchases only.
+
+### 3.5 Writing a route in the fork
 
 Use `app/routes/contact/route.tsx` (content supplies the design, the fork supplies the
 action) or `app/routes/tools+/website-audit/route.tsx` (fully hand-written public page with
