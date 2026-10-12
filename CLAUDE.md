@@ -231,6 +231,12 @@ routes under `app/routes/tools+/feature-requests+/`. Setup and operations are in
   `<header>` so `site-chrome.server.ts` extracts it) that asks `GET /account/me` and renders the dropdown.
   The fork sets a plain `df_account=1` cookie at sign-in purely as a draw-the-button-first hint. Changing the
   menu means editing the component plus all page copies and the `index`/`anvil-db` builder trees (section 2.3).
+  Fork routes must render the chrome through `app/components/cms-html.tsx` (`<CmsHtml html={chrome.headerHtml} />`),
+  never a bare `dangerouslySetInnerHTML`: React 19 compares the `{ __html }` object by identity and re-assigns
+  `innerHTML` on every re-render (React Router re-renders once right after hydration), which wiped the menu the
+  script had drawn, and `innerHTML` never runs scripts. `CmsHtml` memoises the object and re-runs the chrome's
+  inline scripts on client-side mounts, so a chrome script must be safe to run twice (the menu checks
+  `data-account-ready`).
 - Data and accounts live in **Anvil DB** (`ANVIL_URL` + `ANVIL_SERVICE_KEY`, or admin
   user/password, in `.env`; never commit the key). People sign up and sign in through Anvil's
   own `/auth/*` endpoints; after that the app trusts its own signed `_fr_session` cookie.
