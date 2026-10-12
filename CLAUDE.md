@@ -211,9 +211,9 @@ routes under `app/routes/tools+/feature-requests+/`. Setup and operations are in
   Stencil's `loginUrl` setting (Settings > General) points `/login` at `/account/sign-in`; the CMS
   GitHub sign-in is `/content/login`. `safeNext` accepts any same-site path except the auth pages.
   The account lives in the Anvil app `devforge` (`ANVIL_APP`, `app/lib/account/anvil-app.server.ts`):
-  sign-up (emailed code only since 2026-10-13: the site never sets a password) and sign-in code requests
-  name it so its email templates apply, and every sign-in enrols the person as a `reader` member (never
-  downgrading an existing member). The tool's board and widget flows keep
+  sign-up and sign-in are both by emailed code only (since 2026-10-13; the site never uses passwords) and
+  their code requests name it so its email templates apply, and every sign-in enrols the person as a
+  `reader` member (never downgrading an existing member). The tool's board and widget flows keep
   `app: feature_requests`. Anvil accounts are global; membership is bookkeeping, not an access gate.
 - **Roles are Devforge's own** (since 2026-10-12): rows in Anvil `app_devforge.roles` **keyed by UUID**, each
   with a stable `slug` (`admin`, `client`, `member` are seeded from `app/lib/account/roles.ts`; admins add more
